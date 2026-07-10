@@ -1,22 +1,22 @@
 # Recipes for working with coding agents
 
-One line each; the prompt is the payload, unlocking a capability the agent has
-but skips by default. Two tools do the work: [iac](https://github.com/Anode1/iac)
+Most recipes carry a one-line prompt, the payload that unlocks a capability the
+agent has but skips by default. Recipe 1 is the foundation the rest stand on: a
+test per feature. Two tools do the work: [iac](https://github.com/Anode1/iac)
 (inter-agent messaging) and [ais](https://github.com/Anode1/ais) (associative
 memory). Cost claims link to a paper.
 
-## 1. Test-driven development, UI included
+## 1. Test every feature, UI included
 
-**Say:** "write the test first, then make it pass"
-
-Regression tests are the industry standard, and for an agent they are the
-definition of done: a failing test is a checkable target it iterates against
-alone, without you in the loop. UI is not the exception. A project-local screenshot harness makes the screen testable headlessly: a
-headless browser (CDP) for a web UI, a virtual display (Xvfb) for a native GUI.
-The agent brings up the app, auths and seeds any data it needs, renders, captures
-the PNG, reads it back, tears down, and asserts the expected state, in CI like any
-other test. Non-UI: a suite
-the agent runs itself (iac's `make ut` + ASan/UBSan + CI).
+Every feature ships with a test the agent runs itself: a test is a checkable
+target it iterates against without you in the loop (what "done" means is recipe
+4). UI is not exempt, and the highest-leverage thing you can build is a screenshot
+harness that makes the screen testable headlessly: a headless browser (CDP) for a
+web UI, a virtual display (Xvfb) for a native GUI. With it the agent brings up the
+app, auths and seeds the data it needs, renders, captures the PNG, reads it back,
+asserts the expected state, and tears down, in CI like any other test. Non-UI code
+is easier: a suite the agent runs itself (`make ut` + ASan/UBSan + CI). Build the
+harness once and every later feature, UI or not, has a way to prove itself.
 
 ## 2. Recall, don't re-derive
 
