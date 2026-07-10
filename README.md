@@ -107,3 +107,18 @@ reasons over a lossy summary and quality drops. Start fresh: the project's real
 state lives in its docs (recipe 4) and its ais index (recipe 2), so a new session
 reconstitutes by recall, cheap and complete, not by replaying the whole history.
 Keep the window short.
+
+## 8. Thin backend: SQL to JSON, no layers between
+
+**Say:** "return JSON straight from the query, one connection per request"
+
+For a full-stack app, drop the object layers between the database and the wire.
+No POJOs, no ORM, no DTO mapping: hand-written SQL returns the rows, and the
+row-to-JSON transform happens on the fly, streamed to the response as the result
+set is read, never materialized as an object graph first. One user action is one
+request is one connection: prefer a single query with JOINs over a loop that
+issues a query per row, and one bulk insert over inserting in a loop, reusing the
+same connection for the whole request. SQL is the native language for relational
+algebra and the most direct way to say what you need; an ORM is a human-facing
+layer over it (recipe 5), and for an agent it is cost with no benefit it can feel.
+Fewer layers: fewer tokens to hold, fewer places to be wrong.
