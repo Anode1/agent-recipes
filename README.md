@@ -122,3 +122,21 @@ same connection for the whole request. SQL is the native language for relational
 algebra and the most direct way to say what you need; an ORM is a human-facing
 layer over it (recipe 5), and for an agent it is cost with no benefit it can feel.
 Fewer layers: fewer tokens to hold, fewer places to be wrong.
+
+## 9. MISRA-style C: stack-first, bounded, no heap
+
+**Say:** "stack-first, no heap, bounded buffers"
+
+When the agent writes C, hold it to the avionics and medical-device standard and
+most of C's CVE classes cannot occur by construction. Process one record at a time
+in automatic (stack) variables and fixed-size buffers; peak memory is a function
+of the struct sizes, not the data size, so a 10 GB input and a 10 KB input run in
+the same footprint. Avoid the heap; when it is truly unavoidable the allocation is
+bounded, documented, and freed on every path. Bounded strings only (`snprintf`,
+never `strcpy`/`strcat`/`sprintf`). Single exit via `goto cleanup` when a function
+holds a resource. Return codes, not `exit()`, inside the modules. Build clean under
+`-std=c99 -Wall -Wextra` (a warning is a defect) and run the suite under
+AddressSanitizer/UBSan. This is NASA's Power of Ten (rule 3, no heap after init)
+and MISRA C:2012 rule 21.3, the discipline that lets the code run unattended.
+
+Full rules: ais's [`STYLE.md`](https://github.com/Anode1/ais/blob/main/doc/dev/STYLE.md).
