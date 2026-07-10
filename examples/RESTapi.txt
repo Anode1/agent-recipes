@@ -1,5 +1,5 @@
 ===============================================================================
-EXAMPLE ONLY -- a real project has hundreds of API calls. This file keeps only
+EXAMPLE ONLY - a real project has hundreds of API calls. This file keeps only
 the universal account/auth surface (status, login, logout, password reset,
 registration, user administration) to show the FORMAT an agent-readable API doc
 takes: one fixed template per endpoint, in a stable order, so an agent can find
@@ -12,7 +12,7 @@ The paired file RESTapi-examples.txt mirrors this one, call for call.
 NOTE:
 - "Status" indicates current implementation state.
 - The code is canonical; this document describes the code. Where the two
-  disagree, the code wins and the document is stale — please update it.
+  disagree, the code wins and the document is stale - please update it.
   Ground truth lives in the server's routing, request handlers, and data-access layer.
 
 ===============================================================================

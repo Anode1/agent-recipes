@@ -1,5 +1,5 @@
 ===============================================================================
-EXAMPLE ONLY -- paired with RESTapi.txt, call for call. Concrete requests for the
+EXAMPLE ONLY - paired with RESTapi.txt, call for call. Concrete requests for the
 same universal endpoints. A real project has hundreds; this keeps just the auth
 surface so the two files show the convention: a reference doc and a matching
 examples doc, kept in the same order, both updated whenever an endpoint changes.
