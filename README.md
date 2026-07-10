@@ -168,3 +168,9 @@ version-sync; make plus a compiler, and ant, are close to what a stock box
 already has. The build is also a file the agent reads and edits, so keep it small,
 explicit, and offline: a stock toolchain builds the project unchanged, with no
 generated layer between the command and the compiler (recipe 5).
+
+Templates: [`examples/build.xml`](examples/build.xml) (Java web app: compile,
+jar with a version-stamped manifest, war, run, test) and
+[`examples/Makefile`](examples/Makefile) (C: build, test, sanitizers, install).
+The fuller C starter, with the one-file-per-concept layout and tests wired, is
+[aisconfig](https://github.com/Anode1/aisconfig).

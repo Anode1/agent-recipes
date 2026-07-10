@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Ant build template for a thin Java servlet web app: no Maven, no Gradle,
+     jars vendored in the repo. Rename "myapp" to your project, and the two
+     example main classes (com.example.*) to yours. Assumed layout:
+       src/                    Java sources
+       webapp/                 exploded web root (served as-is in dev)
+       webapp/WEB-INF/web.xml
+       webapp/WEB-INF/lib/     runtime jars (vendored)
+       lib/                    compile-only / dev jars (vendored)
+     Targets: compile (default) | jar | war | run | ut | clean | help -->
+<project name="myapp" basedir="." default="compile">
+
+	<property name="version" value="0" />
+	<property name="src" value="src" />
+	<property name="www" value="webapp" />
+	<property name="build" value="bin" />
+	<property name="deploy" value="deploy" />
+	<property name="jar" value="${ant.project.name}.jar" />
+	<property name="jar.path" value="${www}/WEB-INF/lib/${jar}" />
+	<property name="war" value="ROOT.war" />
+
+	<!-- Vendored jars only; no online resolution. -->
+	<path id="classpath">
+		<fileset dir="${www}/WEB-INF/lib">
+			<include name="**/*.jar" />
+			<exclude name="**/${jar}" />
+		</fileset>
+		<fileset dir="lib">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<target name="init">
+		<tstamp />
+	</target>
+
+	<target name="clean" depends="init">
+		<delete file="${jar.path}" failonerror="false" />
+		<delete dir="${build}" includeEmptyDirs="true" failonerror="false" />
+		<delete dir="${deploy}" includeEmptyDirs="true" failonerror="false" />
+	</target>
+
+	<target name="compile" depends="clean">
+		<mkdir dir="${build}" />
+		<javac srcdir="${src}" destdir="${build}" source="11" target="11"
+		       debug="true" includeantruntime="false" encoding="UTF-8">
+			<classpath refid="classpath" />
+		</javac>
+	</target>
+
+	<!-- Stamp version.build onto the jar manifest so the running app can report
+	     its own version (e.g. via a /api/status endpoint): one artifact, one
+	     version, promoted per environment (see recipe 6). build.number
+	     auto-increments and is committed. -->
+	<target name="jar" depends="compile">
+		<buildnumber file="${basedir}/build.number" />
+		<property name="deploy.version" value="${version}.${build.number}" />
+		<jar jarfile="${jar.path}">
+			<fileset dir="${build}" includes="**/*.class" />
+			<manifest>
+				<attribute name="Implementation-Version" value="${deploy.version}" />
+			</manifest>
+		</jar>
+	</target>
+
+	<!-- Build the deployable ROOT.war. Config and secrets come from the
+	     container at runtime, never baked into the war. -->
+	<target name="war" depends="jar">
+		<mkdir dir="${deploy}" />
+		<war warfile="${deploy}/${war}" webxml="${www}/WEB-INF/web.xml">
+			<fileset dir="${www}" excludes="WEB-INF/web.xml" />
+		</war>
+	</target>
+
+	<!-- Run the embedded dev server straight from ant. -->
+	<target name="run" depends="init">
+		<java classname="com.example.EmbeddedServer" fork="true" failonerror="true">
+			<classpath refid="classpath" />
+		</java>
+	</target>
+
+	<!-- End-to-end tests against a LIVE server (start it first). Deliberately no
+	     depends="compile": recompiling would clean bin/ out from under the
+	     running server. Run `ant` yourself first if you changed code. -->
+	<target name="ut">
+		<java classname="com.example.tests.Tests" fork="true" failonerror="true">
+			<classpath>
+				<pathelement location="${build}" />
+				<path refid="classpath" />
+			</classpath>
+		</java>
+	</target>
+
+	<target name="help">
+		<echo>
+Targets for ${ant.project.name}:
+  compile (default)  compile src/ to bin/
+  jar                package bin/ into WEB-INF/lib/${jar} (stamps version)
+  war                build ${deploy}/${war}
+  run                run the embedded dev server
+  ut                 run tests against a live server
+  clean              remove bin/, ${deploy}/, and the jar
+</echo>
+	</target>
+
+</project>
