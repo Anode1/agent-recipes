@@ -12,6 +12,8 @@ is claimed, the measurement is in a linked paper.
 
 ## 1. Make the agent look at the screen
 
+*Say:* "screenshot the page and read it back before you call this done"
+
 For UI work the agent stops at "compiles and traced," because it assumes you
 verify the screen yourself. One line changes that: tell it to render the page and
 read the screenshot back before calling the work done. A small project-local
@@ -23,6 +25,8 @@ and self-verification becomes the norm; the one line still helps for one-offs.
 itself - see iac's `make ut`, AddressSanitizer/UBSan lanes, and CI.)
 
 ## 2. Let many agents coordinate instead of poll
+
+*Say:* "wait on `iac recv`" (and point the agent at the iac repo)
 
 When a job needs several agents at once, give them a shared channel instead of
 having each one poll. Point them at [iac](https://github.com/Anode1/iac): an
@@ -38,6 +42,8 @@ Measured in the paper: [*A Wakeup, Not a Broker*](https://doi.org/10.5281/zenodo
 
 ## 3. Store procedures you repeat, recall them on demand
 
+*Store:* "`ais put <keys> <thing to remember>`"   ·   *Recall:* "`ais <keys>`"
+
 If you catch yourself re-explaining the same steps every session (a deploy
 sequence, an env config, a lookup), write it down once into a memory index and
 recall it with a short prompt. Use [ais](https://github.com/Anode1/ais), an
@@ -51,6 +57,8 @@ Measured in the paper: [*Compress the Access*](https://doi.org/10.5281/zenodo.20
 
 ## 4. Define "done" so the agent enforces it
 
+*Say:* "not done until a test covers it and it is written in the API docs"
+
 Give the agent an explicit definition of done and it holds the line without being
 reminded. A useful rule for a new API endpoint: it is not done until a test
 covers it and passes, and until it is written into the API docs in a fixed,
@@ -60,6 +68,8 @@ rediscovering it each time. See [`examples/RESTapi.txt`](examples/RESTapi.txt)
 for the shape a compact, agent-readable API doc can take.
 
 ## 5. Keep the docs true - they are the agent's cheapest context
+
+*Say (standing rule):* "the docs describe the code; the code wins when they disagree; update the doc in the same change that touches the code"
 
 The strongest context you can give an agent is the whole project directory, and
 in it the prose documentation - reading prose costs far fewer tokens than reading
@@ -72,6 +82,8 @@ not "later." Cheap, true docs are the highest-leverage context an agent has.
 
 ## 6. Let tests drive the work - UI included
 
+*Say:* "write the failing test first (a unit test, or a screenshot assertion), then make it pass"
+
 Verifying after the fact (recipe 1) is good; driving with tests is better. Have
 the agent work test-first: write the test that defines the change, watch it fail,
 then make it pass. A failing test is a precise, self-checkable definition of done
@@ -81,7 +93,5 @@ harness from recipe 1 becomes an assertion, not just a look - the agent
 renders the page and checks the expected element or state is present, so a UI
 change is test-driven too, not eyeballed once. Unit tests for logic, screenshot
 assertions for the screen: either way, "done" is executable.
-
---
 
 Add new recipes at the bottom, same shape.
