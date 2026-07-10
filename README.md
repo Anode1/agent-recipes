@@ -7,7 +7,7 @@ memory). Cost claims link to a paper.
 
 ## 1. Test-driven development, UI included
 
-**Say:** "write the failing test first (unit or screenshot), then make it pass; UI goes through CI too"
+**Say:** "write a failing test first, then make it pass"
 
 Regression tests are the industry standard, and for an agent they are the
 definition of done: a failing test is a checkable target it iterates against
@@ -44,7 +44,7 @@ polling its own inbox pays an inference per check.
 
 ## 4. Docs are ground truth, keep them true
 
-**Say:** "docs describe the code; code wins on conflict; update the doc in the same change"
+**Say:** "update the docs when you change the code"
 
 Prose is the agent's cheapest context, far fewer tokens than code, but only while
 true; a stale doc is worse than none, the agent builds to it and its gaps leak
@@ -57,7 +57,7 @@ request and response examples).
 
 ## 5. Agents work by concepts, not syntax
 
-**Say:** "write plain, readable C; avoid frameworks when you can, skip C++ sugar"
+**Say:** "write plain C, skip C++ and frameworks"
 
 Syntactic sugar and frameworks exist to help *people* manage complexity; an agent
 works by concepts, not surface syntax, so they do not help it, they cost it. Its
