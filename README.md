@@ -5,16 +5,7 @@ but skips by default. Two tools do the work: [iac](https://github.com/Anode1/iac
 (inter-agent messaging) and [ais](https://github.com/Anode1/ais) (associative
 memory). Cost claims link to a paper.
 
-## 1. Make it look at the screen
-
-**Say:** "screenshot the page and read it back before calling this done"
-
-The agent stops at "compiles" and leaves the screen to you. A project-local
-screenshot harness lets it self-verify: bring up the server, auth against local
-dev, seed a row if needed, shoot, read the PNG back, tear down. (Non-UI code, same
-rule: a suite it runs itself, e.g. iac's `make ut` + ASan/UBSan + CI.)
-
-## 2. Coordinate, don't poll
+## 1. Coordinate, don't poll
 
 **Say:** "wait on `iac recv`" (point it at the iac repo)
 
@@ -26,7 +17,7 @@ polling its own inbox pays an inference per check.
 
 [*A Wakeup, Not a Broker*](https://doi.org/10.5281/zenodo.21206970)
 
-## 3. Recall, don't re-derive
+## 2. Recall, don't re-derive
 
 **Store:** "`ais put <keys> <thing>`"   **Recall:** "`ais <keys>`"
 
@@ -38,26 +29,27 @@ the CLI.
 
 [*Compress the Access*](https://doi.org/10.5281/zenodo.20764255)
 
-## 4. Make "done" executable
+## 3. Test-driven development, UI included
 
-**Say:** "not done until a test covers it and it is in the API docs"
+**Say:** "write the failing test first (unit or screenshot), then make it pass; UI goes through CI too"
 
-An explicit "done" holds without reminders: tested, and documented in a fixed,
-ordered place, so the surface stays self-describing and regression-guarded. See
-[`examples/RESTapi.txt`](examples/RESTapi.txt) for the shape.
+Regression tests are the industry standard, and for an agent they are the
+definition of done: a failing test is a checkable target it iterates against
+alone, without you in the loop. UI is not the exception. A project-local
+screenshot harness makes the screen testable: the agent brings up the server,
+auths against local dev, seeds a row if needed, shoots, reads the PNG back, tears
+down, and asserts the expected state, in CI like any other test. Non-UI: a suite
+the agent runs itself (iac's `make ut` + ASan/UBSan + CI).
 
-## 5. Docs are ground truth
+## 4. Docs are ground truth, keep them true
 
 **Say:** "docs describe the code; code wins on conflict; update the doc in the same change"
 
 Prose is the agent's cheapest context, far fewer tokens than code, but only while
-it is true. A stale doc is worse than none: the agent builds to it and its gaps
-leak into the code.
-
-## 6. Tests drive the work, UI too
-
-**Say:** "write the failing test first (unit or screenshot), then make it pass"
-
-Verify-after (recipe 1) is good; test-first is better. A failing test is a
-checkable "done" the agent iterates against alone; the screenshot becomes an
-assertion, not a look.
+true; a stale doc is worse than none, the agent builds to it and its gaps leak
+into the code. So code wins on conflict, and the doc is updated in the same change
+that touches the code. Write docs an agent can act on: for an API, a compact
+reference plus a parallel examples file, same order, updated together. See
+[`examples/RESTapi.txt`](examples/RESTapi.txt) (the reference) and
+[`examples/RESTapi-examples.txt`](examples/RESTapi-examples.txt) (matching
+request and response examples).
