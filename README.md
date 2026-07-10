@@ -44,16 +44,24 @@ polling its own inbox pays an inference per check.
 
 [*A Wakeup, Not a Broker*](https://doi.org/10.5281/zenodo.21206970)
 
-## 4. Docs are ground truth, keep them true
+## 4. Done is code, then doc, then test
 
-**Say:** "update the docs with the code"
+**Say:** "code, then the doc, then a test that replays it"
 
-Prose is the agent's cheapest context, far fewer tokens than code, but only while
-true; a stale doc is worse than none, the agent builds to it and its gaps leak
-into the code. So code wins on conflict, and the doc is updated in the same change
-that touches the code. Write docs an agent can act on: for an API, a compact
-reference plus a parallel examples file, same order, updated together. See
-[`examples/RESTapi.txt`](examples/RESTapi.txt) (the reference) and
+Code is ground truth: on any conflict, code wins. An endpoint is not done when it
+runs; it is done in three steps, in order:
+
+1. Write the code, the ground truth.
+2. Write the doc to match, in the same change. Prose is the agent's cheapest
+   context, far fewer tokens than code, but only while true: a stale doc is worse
+   than none, the agent builds to it and its gaps leak into the code.
+3. Replicate the endpoint as a unit test, so the behavior is pinned and the doc
+   has a check.
+
+Write docs an agent can act on: for an API, a compact reference plus a parallel
+examples file, same order, updated together, and the examples double as the
+test's request and response. See [`examples/RESTapi.txt`](examples/RESTapi.txt)
+(the reference) and
 [`examples/RESTapi-examples.txt`](examples/RESTapi-examples.txt) (matching
 request and response examples).
 
