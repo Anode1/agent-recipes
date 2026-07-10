@@ -30,7 +30,7 @@ the CLI.
 
 [*Compress the Access*](https://doi.org/10.5281/zenodo.20764255)
 
-Wire it into the agent as a skill: [`examples/ais-project-refs.SKILL.md`](examples/ais-project-refs.SKILL.md) recalls project URLs, endpoints, and deploy commands from a local ais index by keyword.
+Wire it into the agent as a skill: [`examples/ais-iac.SKILL.md`](examples/ais-iac.SKILL.md) teaches the agent to operate ais and iac (recall before re-deriving, store what it worked out, wait on `iac recv` instead of polling). It teaches the mechanism, not any keys or values, those are yours to choose.
 
 ## 3. Coordinate, don't poll
 
