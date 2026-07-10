@@ -59,9 +59,17 @@ request and response examples).
 **Say:** "write plain, readable C; avoid frameworks when you can, skip C++ sugar"
 
 Syntactic sugar and frameworks exist to help *people* manage complexity; an agent
-works by concepts, not surface syntax, so they do not help it, they cost it. C++
-piles on overloads, templates, and implicit conversions: ambiguity and ways to be
-wrong with no benefit the agent can feel. Default to no framework; reach for
-one only when it plainly earns its keep. If the agent writes it and you can read
-plain C, prefer plain C: less to hold in context, fewer failure modes, cheaper to
-verify.
+works by concepts, not surface syntax, so they do not help it, they cost it. Its
+native reasoning is a continuous latent representation we cannot read, where a
+model can reason more efficiently than through our tokens
+([Coconut](https://arxiv.org/abs/2412.06769)); the whole stack of languages,
+syntax, and frameworks is a human-facing layer. C++ piles on overloads, templates,
+and implicit conversions: ambiguity and ways to be wrong with no benefit the agent
+can feel. Default to no framework; reach for one only when it plainly earns its
+keep. If the agent writes it and you can read plain C, prefer plain C: less to
+hold in context, fewer failure modes, cheaper to verify.
+
+(In practice the author reaches for the most natural language per domain: Java for
+web apps, C for systems and native code, SQL for relational-algebra engines, and
+plain text for data, auditable and universally readable. Natural fits, not
+framework layers.)
