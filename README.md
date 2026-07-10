@@ -76,3 +76,26 @@ hold in context, fewer failure modes, cheaper to verify.
 web apps, C for systems and native code, SQL for relational-algebra engines, and
 plain text for data, auditable and universally readable. Natural fits, not
 framework layers.)
+
+## 6. Build once, promote the same artifact
+
+**Say:** "build once, promote the same artifact"
+
+A web app running across several environments (dev, uat, prod): do not rebuild
+from source per environment. Build one artifact, promote that same one
+everywhere; config and secrets come from the environment at runtime, never baked
+into the build. One approved artifact is what ships, so a rollback is just
+promoting the previous one, and a source-control compromise cannot silently reach
+production.
+
+[*Artifact Promotion as a Control Model*](https://doi.org/10.5281/zenodo.20451078)
+
+## 7. Fresh session beats a compacted one
+
+**Do:** start a fresh session once the agent begins compacting.
+
+The context window is working memory, not storage. Once the agent compacts, it
+reasons over a lossy summary and quality drops. Start fresh: the project's real
+state lives in its docs (recipe 4) and its ais index (recipe 2), so a new session
+reconstitutes by recall, cheap and complete, not by replaying the whole history.
+Keep the window short.
