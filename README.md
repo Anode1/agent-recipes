@@ -93,5 +93,3 @@ harness from recipe 1 becomes an assertion, not just a look - the agent
 renders the page and checks the expected element or state is present, so a UI
 change is test-driven too, not eyeballed once. Unit tests for logic, screenshot
 assertions for the screen: either way, "done" is executable.
-
-Add new recipes at the bottom, same shape.
