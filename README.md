@@ -30,6 +30,8 @@ the CLI.
 
 [*Compress the Access*](https://doi.org/10.5281/zenodo.20764255)
 
+Wire it into the agent as a skill: [`examples/ais-project-refs.SKILL.md`](examples/ais-project-refs.SKILL.md) recalls project URLs, endpoints, and deploy commands from a local ais index by keyword.
+
 ## 3. Coordinate, don't poll
 
 **Say:** "wait on `iac recv`"
