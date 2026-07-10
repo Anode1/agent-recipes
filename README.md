@@ -11,10 +11,11 @@ memory). Cost claims link to a paper.
 
 Regression tests are the industry standard, and for an agent they are the
 definition of done: a failing test is a checkable target it iterates against
-alone, without you in the loop. UI is not the exception. A project-local
-screenshot harness makes the screen testable: the agent brings up the server,
-auths against local dev, seeds a row if needed, shoots, reads the PNG back, tears
-down, and asserts the expected state, in CI like any other test. Non-UI: a suite
+alone, without you in the loop. UI is not the exception. A project-local screenshot harness makes the screen testable headlessly: a
+headless browser (CDP) for a web UI, a virtual display (Xvfb) for a native GUI.
+The agent brings up the app, auths and seeds any data it needs, renders, captures
+the PNG, reads it back, tears down, and asserts the expected state, in CI like any
+other test. Non-UI: a suite
 the agent runs itself (iac's `make ut` + ASan/UBSan + CI).
 
 ## 2. Recall, don't re-derive
