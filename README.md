@@ -56,11 +56,12 @@ request and response examples).
 
 ## 5. Agents work by concepts, not syntax
 
-**Say:** "write plain, readable C; skip C++ and framework sugar"
+**Say:** "write plain, readable C; avoid frameworks when you can, skip C++ sugar"
 
 Syntactic sugar and frameworks exist to help *people* manage complexity; an agent
 works by concepts, not surface syntax, so they do not help it, they cost it. C++
 piles on overloads, templates, and implicit conversions: ambiguity and ways to be
-wrong with no benefit the agent can feel. If the agent writes it and you can read
+wrong with no benefit the agent can feel. Default to no framework; reach for
+one only when it plainly earns its keep. If the agent writes it and you can read
 plain C, prefer plain C: less to hold in context, fewer failure modes, cheaper to
 verify.
