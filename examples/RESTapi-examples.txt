@@ -1,0 +1,123 @@
+===============================================================================
+EXAMPLE ONLY -- paired with RESTapi.txt, call for call. Concrete requests for the
+same universal endpoints. A real project has hundreds; this keeps just the auth
+surface so the two files show the convention: a reference doc and a matching
+examples doc, kept in the same order, both updated whenever an endpoint changes.
+===============================================================================
+
+===============================================================================
+
+This file mirrors the structure and titles of RESTapi.txt.
+Each section provides curl examples corresponding to the endpoint.
+
+Conventions used below:
+- TOKEN is assumed to be a valid auth token
+- Preferred auth is:  -H "Authorization: Bearer <TOKEN>"
+
+===============================================================================
+Status - check
+===============================================================================
+
+Example:
+    curl -X GET http://localhost:9090/api/status
+
+
+===============================================================================
+Login - authenticate
+===============================================================================
+
+Example:
+    curl -X POST http://localhost:9090/api/login \
+         -H "Content-Type: application/json" \
+         -d '{
+               "email": "test@test.com",
+               "password": "test123"
+             }'
+
+===============================================================================
+Logout - invalidate token
+===============================================================================
+
+Example:
+    curl -X POST http://localhost:9090/api/logout \
+         -H "Authorization: Bearer <TOKEN>"
+
+===============================================================================
+Password_Reset - request
+===============================================================================
+
+Example:
+    curl -X POST http://localhost:9090/api/password_reset/request \
+         -H "Content-Type: application/json" \
+         -d '{"email":"test@test.com"}'
+
+===============================================================================
+Password_Reset - confirm
+===============================================================================
+
+Example:
+    curl -X POST http://localhost:9090/api/password_reset/confirm \
+         -H "Content-Type: application/json" \
+         -d '{
+               "token": "<RESET_TOKEN>",
+               "password": "new_password"
+             }'
+
+===============================================================================
+Registration - send
+===============================================================================
+
+Example:
+    curl -X POST http://localhost:9090/api/users/send_registration \
+         -H "Content-Type: application/json" \
+         -H "Authorization: Bearer <TOKEN>" \
+         -d '{
+               "email": "registration@test.com",
+               "username": "Registration User",
+               "role": "EDITOR"
+             }'
+
+# Notes:
+# - role is optional; allowed values: USER (default) | EDITOR | ADMIN.
+# - Caller must have ADMIN role to invite ADMIN or EDITOR; otherwise 403 admin_role_required.
+
+===============================================================================
+Registration - complete
+===============================================================================
+
+Example:
+    curl -X POST http://localhost:9090/api/register \
+         -H "Content-Type: application/json" \
+         -d '{
+               "token": "<registration-token>",
+               "password": "StrongPassword!"
+             }'
+
+===============================================================================
+Admin_Users - list
+===============================================================================
+
+Example:
+    curl -X GET "http://localhost:9090/api/admin_users?days=30&role=EDITOR" \
+         -H "Authorization: Bearer <TOKEN>"
+
+# role is optional; allowed values: USER (default) | EDITOR | ADMIN.
+
+===============================================================================
+Admin_User - delete (soft)
+===============================================================================
+
+Example:
+    curl -X POST "http://localhost:9090/api/admin_users/123/delete" \
+         -H "Authorization: Bearer <TOKEN>" \
+         -H "Content-Type: application/json" \
+         -d '{}'
+
+===============================================================================
+Admin_Users - change role
+===============================================================================
+Example:
+    curl -X POST http://localhost:9090/api/admin_users/7/role \
+         -H "Authorization: Bearer <TOKEN>" \
+         -H "Content-Type: application/json" \
+         -d '{ "role": "ADMIN" }'

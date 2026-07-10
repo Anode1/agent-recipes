@@ -1,0 +1,326 @@
+===============================================================================
+EXAMPLE ONLY -- a real project has hundreds of API calls. This file keeps only
+the universal account/auth surface (status, login, logout, password reset,
+registration, user administration) to show the FORMAT an agent-readable API doc
+takes: one fixed template per endpoint, in a stable order, so an agent can find
+and test any call without reading the code. Copy the shape, not these endpoints.
+The paired file RESTapi-examples.txt mirrors this one, call for call.
+===============================================================================
+
+===============================================================================
+
+NOTE:
+- "Status" indicates current implementation state.
+- The code is canonical; this document describes the code. Where the two
+  disagree, the code wins and the document is stale — please update it.
+  Ground truth lives in the server's routing, request handlers, and data-access layer.
+
+===============================================================================
+Authentication Rules (Global)
+===============================================================================
+
+Protected endpoints require a valid token via:
+- Authorization: Bearer <token> (preferred)
+- OR ?token=<token> (GET only - fallback)
+
+If token is missing:
+    401 {"error":"missing_authentication_token"}
+
+If token invalid:
+    401 {"error":"invalid_or_expired_token"}
+
+If token references nonexistent user:
+    401 {"error":"user_not_found"}
+
+Public endpoints:
+    api/status
+    api/login
+    api/register
+    api/password_reset/*
+    api/<static assets>
+
+
+Protected endpoints:
+    api/users/{id}
+    api/users/send_registration
+    api/admin_users/*
+    ...
+    
+
+Format (template for all endpoints):
+===============================================================================
+<Object or Process> - <Action>
+===============================================================================
+
+Path:
+Client:
+Server:
+Errors:
+Notes:
+
+===============================================================================
+Status - check
+===============================================================================
+Status: IMPLEMENTED
+
+Path:
+    GET api/status
+
+Client:
+    GET api/status
+
+Server:
+    200 {"status":"ok"}
+
+
+===============================================================================
+Login - authenticate
+===============================================================================
+Status: IMPLEMENTED
+
+Path:
+    POST api/login
+
+Client:
+    POST api/login
+    {
+        "email": "test@test.com",
+        "password": "test123"
+    }
+
+Server:
+    200 {
+        "user_id": 3,
+        "email": "test@test.com",
+        "username": "Test User",
+        "roles": ["USER"],
+        "token": "<signed-token>"
+    }
+
+Errors:
+    401 {"error":"invalid_credentials"}
+    400 {"error":"empty_json_body"}
+    400 {"error":"field_xxx_required"}
+
+Notes:
+- GET api/login returns login_not_supported_in_get.
+
+===============================================================================
+Logout - invalidate token
+===============================================================================
+Status: IMPLEMENTED
+
+Path:
+    POST api/logout
+
+Client:
+    POST api/logout
+    Authorization: Bearer <token>
+
+Server:
+    200 {"status":"logged_out"}
+
+Notes:
+- Token removed from VALID_TOKEN.
+- Logged-out token becomes invalid immediately.
+
+===============================================================================
+Password_Reset - request
+===============================================================================
+Status: IMPLEMENTED
+
+Path:
+    POST api/password_reset/request
+
+Client:
+    { "email": "test@test.com" }
+
+Server:
+    200 {"status":"reset_email_sent"}
+    400 {"error":"email_required"}
+    400 {"error":"unknown_email"}
+
+Notes:
+- Creates password-reset token.
+- Email sending mocked in tests.
+
+===============================================================================
+Password_Reset - confirm
+===============================================================================
+Status: IMPLEMENTED
+
+Path:
+    POST api/password_reset/confirm
+
+Client:
+    {
+        "token": "....",
+        "password": "NewPass123!"
+    }
+
+Server:
+    200 {"status":"password_reset"}
+    400 {"error":"token_required"}
+    400 {"error":"password_required"}
+    400 {"error":"invalid_or_expired_token"}
+
+Notes:
+- Updates USER.password_hash.
+
+
+===============================================================================
+Registration - send
+===============================================================================
+Status: IMPLEMENTED
+
+Path:
+    POST api/users/send_registration
+
+Client:
+    Authorization: Bearer <token>
+    {
+      "email": "someone@example.com",
+      "username": "Some Name",
+      "role": "EDITOR"          // optional: USER (default) | EDITOR | ADMIN
+    }
+
+Server:
+    200 {
+        "status": "sent",
+        "created": true,             // whether a new USER row was created
+        "role_ensured": true         // whether the requested role was added (for ADMIN/EDITOR invites)
+    }
+
+Errors:
+    400 {"error":"email_required"}
+    400 {"error":"unknown_email"}             // email not in USER and no username provided to auto-create
+    400 {"error":"invalid_role"}              // role not in {USER, EDITOR, ADMIN}
+    401 {"error":"missing_authentication_token"}
+    401 {"error":"invalid_or_expired_token"}
+    401 {"error":"user_not_found"}
+    403 {"error":"admin_role_required"}       // caller must have ADMIN role to invite ADMIN or EDITOR
+    409 {"error":"already_registered"}        // email already has an active password
+
+Notes:
+- registration_token stored in USER.
+- EDITOR callers may invite USER roles only; only ADMIN may invite ADMIN or EDITOR.
+
+===============================================================================
+Registration - complete
+===============================================================================
+Status: IMPLEMENTED
+
+Path:
+    POST api/register
+
+Client:
+    {
+        "token": "<registration-token>",
+        "password": "StrongPassword!"
+    }
+
+Server:
+    200 {"status":"completed"}
+    400 {"error":"token_required"}
+    400 {"error":"password_required"}
+    400 {"error":"invalid_or_expired_registration_token"}
+
+Notes:
+- Marks registration token as used.
+
+===============================================================================
+After this point the objects are going in alphabetical order
+===============================================================================
+
+===============================================================================
+Admin_Users - list
+===============================================================================
+Status: IMPLEMENTED
+
+Path:
+    GET api/admin_users
+
+Query params (optional):
+    days    integer >= 0    (default = 30; max = 3650)
+    role    USER | EDITOR | ADMIN    (default = USER)
+
+Client:
+    GET api/admin_users?days=30&role=EDITOR
+    Authorization: Bearer <token>
+
+Server:
+    200 [
+        ...
+    ]
+
+Errors:
+    400 {"error":"invalid_days"}
+    400 {"error":"invalid_role"}
+    401 {"error":"missing_authentication_token"}
+    401 {"error":"invalid_or_expired_token"}
+
+===============================================================================
+Admin_User - delete (soft)
+===============================================================================
+Status: IMPLEMENTED
+
+Path:
+    POST api/admin_users/{user_id}/delete
+
+Client:
+    POST api/admin_users/123/delete
+    Authorization: Bearer <token>
+    Content-Type: application/json
+    {}
+
+Server:
+    200 {
+        "status": "deleted",
+        "user_id": 123
+    }
+
+Errors:
+    400 {"error":"invalid_user_id"}
+    401 {"error":"missing_authentication_token"}
+    401 {"error":"invalid_or_expired_token"}
+
+===============================================================================
+Admin_Users - change role
+===============================================================================
+Status: IMPLEMENTED
+
+Path:
+    POST api/admin_users/{user_id}/role
+
+Client:
+    POST api/admin_users/7/role
+    Authorization: Bearer <token>
+    Content-Type: application/json
+    { "role": "ADMIN" }
+
+Server:
+    200 {
+        "status": "updated",
+        "user_id": 7,
+        "role": "ADMIN"
+    }
+
+Errors:
+    400 {"error":"..."}                   (missing / invalid JSON body)
+    401 {"error":"..."}                   (no / invalid token)
+    401 {"error":"unauthorized"}          (caller is not EDITOR or ADMIN)
+    403 {"error":"admin_role_required"}   (caller is authorized but NOT ADMIN)
+    400 {"error":"invalid_user_id"}       (non-numeric {user_id})
+    400 {"error":"cannot_modify_self"}    (caller == target)
+    400 {"error":"invalid_role"}          (role not ADMIN or EDITOR)
+    404 {"error":"user_not_found"}        (no such target user)
+    409 {"error":"last_admin"}            (demoting the only remaining active ADMIN)
+
+Notes:
+- ADMIN-only: passes requireAuthorized (EDITOR or ADMIN) AND an explicit
+  user.isAdmin() check; non-admin authorized users get 403 admin_role_required.
+- Single-role replace via UserDAO.setRole. Body field "role" is trimmed/upper-cased,
+  accepted only as "ADMIN" or "EDITOR" ("USER" is rejected).
+- Self-modification is blocked; cannot demote the last active admin.
+
+===============================================================================

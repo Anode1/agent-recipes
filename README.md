@@ -70,6 +70,18 @@ code is ground truth: where a doc and the code disagree, the code wins and the
 doc is stale; and the doc is refreshed in the same iteration the code changes,
 not "later." Cheap, true docs are the highest-leverage context an agent has.
 
+## 6. Let tests drive the work — UI included
+
+Verifying after the fact (recipe 1) is good; driving with tests is better. Have
+the agent work test-first: write the test that defines the change, watch it fail,
+then make it pass. A failing test is a precise, self-checkable definition of done
+the agent iterates against without you in the loop — it cannot declare
+victory until a test it can run says so. Extend it to the UI: the screenshot
+harness from recipe 1 becomes an assertion, not just a look — the agent
+renders the page and checks the expected element or state is present, so a UI
+change is test-driven too, not eyeballed once. Unit tests for logic, screenshot
+assertions for the screen: either way, "done" is executable.
+
 ---
 
 Add new recipes at the bottom, same shape.
