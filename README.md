@@ -7,7 +7,7 @@ memory). Cost claims link to a paper.
 
 ## 1. Test-driven development, UI included
 
-**Say:** "write a failing test first, then make it pass"
+**Say:** "write the test first, then make it pass"
 
 Regression tests are the industry standard, and for an agent they are the
 definition of done: a failing test is a checkable target it iterates against
@@ -32,7 +32,7 @@ the CLI.
 
 ## 3. Coordinate, don't poll
 
-**Say:** "wait on `iac recv`" (point it at the iac repo)
+**Say:** "wait on `iac recv`"
 
 Several agents on one box: one shared channel, not N pollers. Each parks a
 blocking `recv` and wakes when a message lands. A parked `recv` is free; a model
@@ -44,7 +44,7 @@ polling its own inbox pays an inference per check.
 
 ## 4. Docs are ground truth, keep them true
 
-**Say:** "update the docs when you change the code"
+**Say:** "update the docs with the code"
 
 Prose is the agent's cheapest context, far fewer tokens than code, but only while
 true; a stale doc is worse than none, the agent builds to it and its gaps leak
@@ -57,7 +57,7 @@ request and response examples).
 
 ## 5. Agents work by concepts, not syntax
 
-**Say:** "write plain C, skip C++ and frameworks"
+**Say:** "plain C, no frameworks"
 
 Syntactic sugar and frameworks exist to help *people* manage complexity; an agent
 works by concepts, not surface syntax, so they do not help it, they cost it. Its
