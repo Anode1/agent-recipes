@@ -53,3 +53,14 @@ reference plus a parallel examples file, same order, updated together. See
 [`examples/RESTapi.txt`](examples/RESTapi.txt) (the reference) and
 [`examples/RESTapi-examples.txt`](examples/RESTapi-examples.txt) (matching
 request and response examples).
+
+## 5. Agents work by concepts, not syntax
+
+**Say:** "write plain, readable C; skip C++ and framework sugar"
+
+Syntactic sugar and frameworks exist to help *people* manage complexity; an agent
+works by concepts, not surface syntax, so they do not help it, they cost it. C++
+piles on overloads, templates, and implicit conversions: ambiguity and ways to be
+wrong with no benefit the agent can feel. If the agent writes it and you can read
+plain C, prefer plain C: less to hold in context, fewer failure modes, cheaper to
+verify.
