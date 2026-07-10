@@ -1,95 +1,63 @@
 # Recipes for working with coding agents
 
-Each recipe is one short thing to say, plus why it works. The prompt is the
-payload: the agent works the rest out. The value is not in clever wording, it is
-in knowing which one line unlocks a capability the agent already has but does not
-use by default.
+One line each; the prompt is the payload, unlocking a capability the agent has
+but skips by default. Two tools do the work: [iac](https://github.com/Anode1/iac)
+(inter-agent messaging) and [ais](https://github.com/Anode1/ais) (associative
+memory). Cost claims link to a paper.
 
-The examples point at two small public tools built for exactly these recipes:
-[iac](https://github.com/Anode1/iac) (inter-agent messaging) and
-[ais](https://github.com/Anode1/ais) (an associative memory index). Where a cost
-is claimed, the measurement is in a linked paper.
+## 1. Make it look at the screen
 
-## 1. Make the agent look at the screen
+**Say:** "screenshot the page and read it back before calling this done"
 
-*Say:* "screenshot the page and read it back before you call this done"
+The agent stops at "compiles" and leaves the screen to you. A project-local
+screenshot harness lets it self-verify: bring up the server, auth against local
+dev, seed a row if needed, shoot, read the PNG back, tear down. (Non-UI code, same
+rule: a suite it runs itself, e.g. iac's `make ut` + ASan/UBSan + CI.)
 
-For UI work the agent stops at "compiles and traced," because it assumes you
-verify the screen yourself. One line changes that: tell it to render the page and
-read the screenshot back before calling the work done. A small project-local
-screenshot harness is enough - the agent brings up the server, authenticates
-against local dev, seeds a row if the page needs data, captures the screenshot,
-reads it back, then cleans up after itself. Wire it in once as a default skill
-and self-verification becomes the norm; the one line still helps for one-offs.
-(For the same discipline on non-UI code - a real test suite the agent runs
-itself - see iac's `make ut`, AddressSanitizer/UBSan lanes, and CI.)
+## 2. Coordinate, don't poll
 
-## 2. Let many agents coordinate instead of poll
+**Say:** "wait on `iac recv`" (point it at the iac repo)
 
-*Say:* "wait on `iac recv`" (and point the agent at the iac repo)
+Several agents on one box: one shared channel, not N pollers. Each parks a
+blocking `recv` and wakes when a message lands. A parked `recv` is free; a model
+polling its own inbox pays an inference per check.
 
-When a job needs several agents at once, give them a shared channel instead of
-having each one poll. Point them at [iac](https://github.com/Anode1/iac): an
-agent joins a room, parks a blocking `recv`, and wakes the instant a message
-addressed to it lands. One line - "wait on `iac recv`" - is enough; the agent
-works out the room, its name, and the send/recv from the README. A parked `recv`
-costs nothing while it waits, where a model polling its own inbox pays a full
-inference per check:
+![What it costs to keep an agent waiting](images/iac_wakeup_cost.png)
 
-![What it costs to keep an agent waiting for a message](images/iac_wakeup_cost.png)
+[*A Wakeup, Not a Broker*](https://doi.org/10.5281/zenodo.21206970)
 
-Measured in the paper: [*A Wakeup, Not a Broker*](https://doi.org/10.5281/zenodo.21206970).
+## 3. Recall, don't re-derive
 
-## 3. Store procedures you repeat, recall them on demand
+**Store:** "`ais put <keys> <thing>`"   **Recall:** "`ais <keys>`"
 
-*Store:* "`ais put <keys> <thing to remember>`"   ·   *Recall:* "`ais <keys>`"
-
-If you catch yourself re-explaining the same steps every session (a deploy
-sequence, an env config, a lookup), write it down once into a memory index and
-recall it with a short prompt. Use [ais](https://github.com/Anode1/ais), an
-associative memory index: one line stores a procedure, a short recall pulls it
-back. An agent re-searching the project for an answer burns thousands of tokens;
-recalling it from a key index is a handful - or zero on the command line:
+Stop re-explaining the same steps each session. Store once, recall by key.
+Re-searching the project burns thousands of tokens; recall is a handful, zero on
+the CLI.
 
 ![What it costs to find something you already saved](images/ais_recall_cost.png)
 
-Measured in the paper: [*Compress the Access*](https://doi.org/10.5281/zenodo.20764255).
+[*Compress the Access*](https://doi.org/10.5281/zenodo.20764255)
 
-## 4. Define "done" so the agent enforces it
+## 4. Make "done" executable
 
-*Say:* "not done until a test covers it and it is written in the API docs"
+**Say:** "not done until a test covers it and it is in the API docs"
 
-Give the agent an explicit definition of done and it holds the line without being
-reminded. A useful rule for a new API endpoint: it is not done until a test
-covers it and passes, and until it is written into the API docs in a fixed,
-ordered place. That keeps the surface self-describing and regression-guarded, so
-the next agent can test and orchestrate against it automatically instead of
-rediscovering it each time. See [`examples/RESTapi.txt`](examples/RESTapi.txt)
-for the shape a compact, agent-readable API doc can take.
+An explicit "done" holds without reminders: tested, and documented in a fixed,
+ordered place, so the surface stays self-describing and regression-guarded. See
+[`examples/RESTapi.txt`](examples/RESTapi.txt) for the shape.
 
-## 5. Keep the docs true - they are the agent's cheapest context
+## 5. Docs are ground truth
 
-*Say (standing rule):* "the docs describe the code; the code wins when they disagree; update the doc in the same change that touches the code"
+**Say:** "docs describe the code; code wins on conflict; update the doc in the same change"
 
-The strongest context you can give an agent is the whole project directory, and
-in it the prose documentation - reading prose costs far fewer tokens than reading
-the code for the same understanding. But that leverage holds only while the docs
-are current. A stale doc is worse than none: the agent trusts it, builds to it,
-and the doc's deficiencies migrate into the code. So set one standing rule - the
-code is ground truth: where a doc and the code disagree, the code wins and the
-doc is stale; and the doc is refreshed in the same iteration the code changes,
-not "later." Cheap, true docs are the highest-leverage context an agent has.
+Prose is the agent's cheapest context, far fewer tokens than code, but only while
+it is true. A stale doc is worse than none: the agent builds to it and its gaps
+leak into the code.
 
-## 6. Let tests drive the work - UI included
+## 6. Tests drive the work, UI too
 
-*Say:* "write the failing test first (a unit test, or a screenshot assertion), then make it pass"
+**Say:** "write the failing test first (unit or screenshot), then make it pass"
 
-Verifying after the fact (recipe 1) is good; driving with tests is better. Have
-the agent work test-first: write the test that defines the change, watch it fail,
-then make it pass. A failing test is a precise, self-checkable definition of done
-the agent iterates against without you in the loop - it cannot declare
-victory until a test it can run says so. Extend it to the UI: the screenshot
-harness from recipe 1 becomes an assertion, not just a look - the agent
-renders the page and checks the expected element or state is present, so a UI
-change is test-driven too, not eyeballed once. Unit tests for logic, screenshot
-assertions for the screen: either way, "done" is executable.
+Verify-after (recipe 1) is good; test-first is better. A failing test is a
+checkable "done" the agent iterates against alone; the screenshot becomes an
+assertion, not a look.
