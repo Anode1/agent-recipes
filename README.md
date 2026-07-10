@@ -140,3 +140,16 @@ AddressSanitizer/UBSan. This is NASA's Power of Ten (rule 3, no heap after init)
 and MISRA C:2012 rule 21.3, the discipline that lets the code run unattended.
 
 Full rules: ais's [`STYLE.md`](https://github.com/Anode1/ais/blob/main/doc/dev/STYLE.md).
+
+## 10. Frontend in triples: one screen, html + js + css
+
+**Say:** "html/js/css triple per screen, split by concept not line count"
+
+No build step: the frontend is served exploded, so a saved file is picked up on
+reload, no bundler, no transpile, no framework. Each screen is a same-named
+triple: `foo.html`, `js/foo.js`, `css/foo.css`, with a shared `app.css` for what
+is common. Line count is not a concern; concepts are. When a screen grows a
+second cohesive concept (a distinct component, an isolatable behavior), give it
+its own file rather than letting one file carry two jobs, the same
+one-file-per-concept discipline as the C core (recipe 9). A reader finds a
+screen's markup, behavior, and style by its name, and each file does one thing.
