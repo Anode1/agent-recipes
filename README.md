@@ -15,8 +15,9 @@ harness that makes the screen testable headlessly: a headless browser (CDP) for 
 web UI, a virtual display (Xvfb) for a native GUI. With it the agent brings up the
 app, auths and seeds the data it needs, renders, captures the PNG, reads it back,
 asserts the expected state, and tears down, in CI like any other test. Non-UI code
-is easier: a suite the agent runs itself (`make ut` + ASan/UBSan + CI). Build the
-harness once and every later feature, UI or not, has a way to prove itself.
+is easier: a suite the agent runs itself (`make ut` + ASan/UBSan in C, `ant` in
+Java, run in CI). Build the harness once and every later feature, UI or not, has a
+way to prove itself.
 
 ## 2. Recall, don't re-derive
 
