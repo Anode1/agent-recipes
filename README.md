@@ -1,8 +1,8 @@
 # Recipes for working with coding agents
 
-Practices for driving coding agents. Most carry a one-line prompt: a short
-instruction that redirects the agent's default toward output you can verify
-cheaply. Recipe 1 is the foundation the rest stand on: a test per feature.
+Practices for driving coding agents. Each carries a one-line lead, the payload:
+**Say:** is what you tell the agent, **Do:** is a practice you follow yourself.
+The paragraph under it is why.
 
 Some recipes are close to universal (test every feature, keep docs true); others
 are the author's choices for specific projects (plain C, SQL to JSON, plain
@@ -12,48 +12,24 @@ wrote, [iac](https://github.com/Anode1/iac) (inter-agent messaging) and
 [ais](https://github.com/Anode1/ais) (associative memory). Some recipes link to a
 cost model or paper.
 
-## 1. Test every feature, UI included
+## Foundations
+
+### 1. Test every feature, UI included
+
+**Do:** test every feature, UI included, on a harness the agent can drive.
 
 Every feature ships with a test the agent runs itself: a test is a checkable
-target it iterates against without you in the loop (what "done" means is recipe
-4). UI is not exempt, and the highest-leverage thing you can build is a screenshot
-harness that makes the screen testable headlessly: a headless browser (CDP) for a
-web UI, a virtual display (Xvfb) for a native GUI. With it the agent brings up the
-app, auths and seeds the data it needs, renders, captures the PNG, reads it back,
-asserts the expected state, and tears down, in CI like any other test. Non-UI code
-is easier: a suite the agent runs itself (`make ut` + ASan/UBSan in C, `ant` in
-Java, run in CI). Build the harness once and every later feature, UI or not, has a
-way to prove itself.
+target it iterates against without you in the loop (what "done" means is *Done is
+code, then doc, then test*, next). UI is not exempt, and the highest-leverage
+thing you can build is a screenshot harness that makes the screen testable
+headlessly: a headless browser (CDP) for a web UI, a virtual display (Xvfb) for a
+native GUI. With it the agent brings up the app, auths and seeds the data it
+needs, renders, captures the PNG, reads it back, asserts the expected state, and
+tears down, in CI like any other test. Non-UI code is easier: a suite the agent
+runs itself (`make ut` + ASan/UBSan in C, `ant` in Java, run in CI). Build the
+harness once and every later feature, UI or not, has a way to prove itself.
 
-## 2. Recall, don't re-derive
-
-**Store:** "`ais put <keys> <thing>`"   **Recall:** "`ais <keys>`"
-
-Stop re-explaining the same steps each session. Store once, recall by key.
-Re-searching the project burns thousands of tokens; recall is a handful, the query
-itself is ~free, and the cost scales only with what you stored.
-
-![What it costs to find something you already saved](images/ais_recall_cost.png)
-
-[*Compress the Access*](https://doi.org/10.5281/zenodo.20764255)
-
-Wire it into the agent as a skill: [`examples/ais.SKILL.md`](examples/ais.SKILL.md) teaches the agent to operate ais (recall before re-deriving, store what it worked out). It teaches the mechanism, not any keys or values, those are yours to choose.
-
-## 3. Coordinate, don't poll
-
-**Say:** "wait on `iac recv`"
-
-Several agents on one box: one shared channel, not N pollers. Each parks a
-blocking `recv` and wakes when a message lands. A parked `recv` costs no inference
-while it waits; a model polling its own inbox pays an inference per check.
-
-![What it costs to keep an agent waiting](images/iac_wakeup_cost.png)
-
-[*A Wakeup, Not a Broker*](https://doi.org/10.5281/zenodo.21206970)
-
-Wire it into the agent as a skill: [`examples/iac.SKILL.md`](examples/iac.SKILL.md) teaches the agent to wait on `iac recv` instead of polling.
-
-## 4. Done is code, then doc, then test
+### 2. Done is code, then doc, then test
 
 **Say:** "code, then the doc, then a test that replays it"
 
@@ -74,7 +50,50 @@ test is written from. See [`examples/RESTapi.txt`](examples/RESTapi.txt) (the
 reference) and [`examples/RESTapi-examples.txt`](examples/RESTapi-examples.txt)
 (matching request and response examples).
 
-## 5. Plain code, no frameworks
+### 3. Fresh session beats a compacted one
+
+**Do:** start a fresh session once the agent begins compacting.
+
+The context window is working memory, not storage. Once the window is long or
+compacted, the detail you need may be gone or buried, and quality can drop. Start
+fresh: the project's real state lives in its docs (*Done is code, then doc, then
+test*) and its ais index (*Recall, don't re-derive*), so a new session
+reconstitutes by recall, cheap and complete, not by replaying the whole history.
+Keep the window short.
+
+## Tools
+
+### 4. Recall, don't re-derive
+
+**Say:** "recall with `ais <keys>`, store with `ais -v <thing> <keys>`"
+
+Stop re-explaining the same steps each session. Store once, recall by key.
+Re-searching the project burns thousands of tokens; recall is a handful, the query
+itself is ~free, and the cost scales only with what you stored.
+
+![What it costs to find something you already saved](images/ais_recall_cost.png)
+
+[*Compress the Access*](https://doi.org/10.5281/zenodo.20764255)
+
+Wire it into the agent as a skill: [`examples/ais.SKILL.md`](examples/ais.SKILL.md) teaches the agent to operate ais (recall before re-deriving, store what it worked out). It teaches the mechanism, not any keys or values, those are yours to choose.
+
+### 5. Coordinate, don't poll
+
+**Say:** "wait on `iac recv`"
+
+Several agents on one box: one shared channel, not N pollers. Each parks a
+blocking `recv` and wakes when a message lands. A parked `recv` costs no inference
+while it waits; a model polling its own inbox pays an inference per check.
+
+![What it costs to keep an agent waiting](images/iac_wakeup_cost.png)
+
+[*A Wakeup, Not a Broker*](https://doi.org/10.5281/zenodo.21206970)
+
+Wire it into the agent as a skill: [`examples/iac.SKILL.md`](examples/iac.SKILL.md) teaches the agent to wait on `iac recv` instead of polling.
+
+## The principle
+
+### 6. Plain code, no frameworks
 
 **Say:** "plain C, no frameworks"
 
@@ -91,32 +110,12 @@ web apps, C for systems and native code, SQL for relational-algebra engines, and
 plain text for data, auditable and universally readable. Natural fits, not
 framework layers.)
 
-## 6. Build once, promote the same artifact
+## House style
 
-**Say:** "build once, promote the same artifact"
+The author's stack choices, one instance of *Plain code, no frameworks*, not
+prescriptions.
 
-A web app running across several environments (dev, uat, prod): do not rebuild
-from source per environment. Build one artifact, promote that same one everywhere;
-config and secrets come from the environment at runtime, never baked into the
-build. The database is migrated per environment, out of band from the artifact.
-One approved artifact is what ships, so re-promoting the previous one rolls back
-the code, as long as migrations are backward-compatible (expand, then contract; a
-destructive migration is not reversible this way), and no change reaches
-production without passing the one approved build.
-
-[*Artifact Promotion as a Control Model*](https://doi.org/10.5281/zenodo.20451078)
-
-## 7. Fresh session beats a compacted one
-
-**Do:** start a fresh session once the agent begins compacting.
-
-The context window is working memory, not storage. Once the window is long or
-compacted, the detail you need may be gone or buried, and quality can drop. Start
-fresh: the project's real state lives in its docs (recipe 4) and its ais index
-(recipe 2), so a new session reconstitutes by recall, cheap and complete, not by
-replaying the whole history. Keep the window short.
-
-## 8. Thin backend: SQL to JSON, no layers between
+### 7. Thin backend: SQL to JSON, no layers between
 
 **Say:** "return JSON straight from the query, one connection per request"
 
@@ -130,10 +129,11 @@ over a query-per-row loop, one bulk insert over insert-in-a-loop, an explicit
 transaction only when one action must commit several writes together. Streaming
 ties the connection to the client's speed and cannot change the status code after
 the first byte, so bound the result size. SQL is the native language for
-relational algebra; an ORM is a layer over it (recipe 5) that for an agent is
-mostly cost. Fewer layers: fewer tokens to hold, fewer places to be wrong.
+relational algebra; an ORM is a layer over it (*Plain code, no frameworks*) that
+for an agent is mostly cost. Fewer layers: fewer tokens to hold, fewer places to
+be wrong.
 
-## 9. MISRA-style C: stack-first, bounded, no heap
+### 8. MISRA-style C: stack-first, bounded, no heap
 
 **Say:** "stack-first, no heap, bounded buffers"
 
@@ -156,7 +156,7 @@ lets the code run unattended.
 
 Full rules: ais's [`STYLE.md`](https://github.com/Anode1/ais/blob/main/doc/dev/STYLE.md).
 
-## 10. Plain build: Makefile or Ant, nothing generated
+### 9. Plain build: Makefile or Ant, nothing generated
 
 **Say:** "plain Makefile for C, ant for Java, no autotools, no Maven"
 
@@ -169,11 +169,28 @@ once you have multiple platforms or a real transitive dependency graph to resolv
 short of that they are a dependency you install and version-sync for a problem you
 do not have. The build is also a file the agent reads and edits, so keep it small,
 explicit, and offline: a stock toolchain (GNU make, or ant) builds the project
-unchanged, with no generated layer between the command and the compiler (recipe
-5).
+unchanged, with no generated layer between the command and the compiler (*Plain
+code, no frameworks*).
 
 Templates: [`examples/build.xml`](examples/build.xml) (Java web app: compile, jar
 with a version-stamped manifest, war, run, test) and
 [`examples/Makefile`](examples/Makefile) (C: build, test, sanitizers, install).
 The fuller C starter, with the one-file-per-concept layout and tests wired, is
 [aisconfig](https://github.com/Anode1/aisconfig).
+
+## Shipping
+
+### 10. Build once, promote the same artifact
+
+**Say:** "build once, promote the same artifact"
+
+A web app running across several environments (dev, uat, prod): do not rebuild
+from source per environment. Build one artifact, promote that same one everywhere;
+config and secrets come from the environment at runtime, never baked into the
+build. The database is migrated per environment, out of band from the artifact.
+One approved artifact is what ships, so re-promoting the previous one rolls back
+the code, as long as migrations are backward-compatible (expand, then contract; a
+destructive migration is not reversible this way), and no change reaches
+production without passing the one approved build.
+
+[*Artifact Promotion as a Control Model*](https://doi.org/10.5281/zenodo.20451078)
