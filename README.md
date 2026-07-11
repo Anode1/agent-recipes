@@ -38,6 +38,13 @@ tears down, in CI like any other test. Non-UI code is easier: a suite the agent
 runs itself (`make ut` + ASan/UBSan in C, `ant` in Java, run in CI). Build the
 harness once and every later feature, UI or not, has a way to prove itself.
 
+Two real harnesses to build from: [mincdp](https://github.com/Anode1/mincdp)
+drives headless Chrome over CDP for a web UI (single-file C and Java clients, no
+Selenium or chromedriver); the [Flutter Xvfb test](https://github.com/Anode1/ais/tree/main/app/flutter/uitest)
+drives a native GUI under a virtual display with `xdotool` and screenshots. The
+second is Flutter-specific, but the Xvfb technique captures any GUI, so it doubles
+as the reference for native-GUI capture.
+
 ### 2. Done is code, then doc, then test
 
 **Say:** "code, then the doc, then a test that replays it"
