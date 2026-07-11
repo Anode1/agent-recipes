@@ -72,10 +72,14 @@
 		</war>
 	</target>
 
-	<!-- Run the embedded dev server straight from ant. -->
-	<target name="run" depends="init">
+	<!-- Run the embedded dev server straight from ant. Needs bin/ on the
+	     classpath (the shared classpath is vendored jars only), so compile first. -->
+	<target name="run" depends="compile">
 		<java classname="com.example.EmbeddedServer" fork="true" failonerror="true">
-			<classpath refid="classpath" />
+			<classpath>
+				<pathelement location="${build}" />
+				<path refid="classpath" />
+			</classpath>
 		</java>
 	</target>
 
