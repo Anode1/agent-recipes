@@ -14,11 +14,11 @@ values, those are the developer's to choose.
     ais -o <keys>             # recall: OR across keys, not AND
     ais --find <text>         # full-text search over values and paths
     ais --keys                # list the keys already in use
-    ais -v "<value>" <keys>   # store <value> under <keys>
+    ais <keys> -v "<value>"   # store <value> under <keys> (recall plus -v)
 
 Before spending tokens re-reading the project to work something out, try
 `ais <keys>` first; a recall is a handful of tokens, re-deriving is thousands.
 When you do work something out that you will need again (a URL, a path, a
-command, a fact), store it with `ais -v`, so next session it is a recall. Store a
+command, a fact), store it with `ais <keys> -v`, so next session it is a recall. Store a
 short pointer, not a document. Reuse an existing key (`ais --keys`) before
 inventing one, so the index stays consistent.

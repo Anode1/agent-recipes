@@ -69,7 +69,7 @@ Keep the window short.
 
 ### 4. Recall, don't re-derive
 
-**Say:** "recall with `ais <keys>`, store with `ais -v <thing> <keys>`"
+**Say:** "recall with `ais <keys>`, store with `ais <keys> -v <value>`"
 
 Stop re-explaining the same steps each session. Store once, recall by key.
 Re-searching the project burns thousands of tokens; recall is a handful, the query
