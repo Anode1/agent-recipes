@@ -16,7 +16,7 @@ cost model or paper.
 
 ### 1. Test every feature, UI included
 
-**Do:** test every feature, UI included, on a harness the agent can drive.
+**Do:** build a screenshot harness (CDP for web, Xvfb for native GUI), then a test per feature on it.
 
 Every feature ships with a test the agent runs itself: a test is a checkable
 target it iterates against without you in the loop (what "done" means is *Done is
@@ -79,7 +79,7 @@ Wire it into the agent as a skill: [`examples/ais.SKILL.md`](examples/ais.SKILL.
 
 ### 5. Coordinate, don't poll
 
-**Say:** "wait on `iac recv`"
+**Say:** "wait on `iac recv <room> <you>`"
 
 Several agents on one box: one shared channel, not N pollers. Each parks a
 blocking `recv` and wakes when a message lands. A parked `recv` costs no inference
