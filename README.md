@@ -4,9 +4,17 @@ Practices for driving coding agents. Each carries a one-line lead, the payload:
 **Say:** is what you tell the agent, **Do:** is a practice you follow yourself.
 The paragraph under it is why.
 
-Each is a policy, not a task. Pair the prompt with a concrete target, a file, an
-API, an endpoint, so the agent has both the how (the prompt) and the where (the
-target). Said naked, a policy is understood but has nothing to act on.
+Each recipe is a policy over three things: a state, a goal, and a verifier. The
+state is the directory the agent works in, the files are all it can see. The goal
+is the prompt. The verifier is the test or harness that tells the agent it got
+there. You seldom name a target, the directory scopes one; the prompt is the goal;
+the verifier closes the loop. Most people supply the first two and forget the
+third.
+
+The files are also the channel: the directory is how you talk to the agent, and
+its only durable memory. Anything it needs that lives in your head or the chat is
+invisible to it, and gone the next session, so put the state, the intent, and the
+check in the files.
 
 Some recipes are close to universal (test every feature, keep docs true); others
 are the author's choices for specific projects (plain C, SQL to JSON, plain
