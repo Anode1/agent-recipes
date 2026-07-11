@@ -5,8 +5,9 @@ Practices for driving coding agents. Each carries a one-line lead, the payload:
 The paragraph under it is why.
 
 Each recipe is a policy over three things: a state, a goal, and a verifier. The
-state is the directory the agent works in, the files are all it can see. The goal
-is the prompt. The verifier is the test or harness that tells the agent it got
+state is the directory the agent works in, the files are all it can see; split
+work into projects and directories by concept, so each scope is a small, complete
+state the agent can hold whole. The goal is the prompt. The verifier is the test or harness that tells the agent it got
 there. You seldom name a target, the directory scopes one; the prompt is the goal;
 the verifier closes the loop. Most people supply the first two and forget the
 third.
