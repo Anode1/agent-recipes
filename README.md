@@ -4,6 +4,10 @@ Practices for driving coding agents. Each carries a one-line lead, the payload:
 **Say:** is what you tell the agent, **Do:** is a practice you follow yourself.
 The paragraph under it is why.
 
+Each is a policy, not a task. Pair the prompt with a concrete target, a file, an
+API, an endpoint, so the agent has both the how (the prompt) and the where (the
+target). Said naked, a policy is understood but has nothing to act on.
+
 Some recipes are close to universal (test every feature, keep docs true); others
 are the author's choices for specific projects (plain C, SQL to JSON, plain
 builds). None are offered as absolutes: they are tips, take what fits your stack
