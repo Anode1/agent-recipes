@@ -4,17 +4,13 @@ Practices for driving coding agents. Each carries a one-line lead, the payload:
 **Say:** is what you tell the agent, **Do:** is a practice you follow yourself.
 The paragraph under it is why.
 
-Each recipe is a policy over three things: a state, a goal, and a verifier. The
-state is the directory the agent works in, the files are all it can see; split
-work into projects and directories by concept, so each scope is a small, complete
-state the agent can hold whole. The goal is the prompt. The verifier is the test or harness that tells the agent it got
-there. You seldom name a target, the directory scopes one; the prompt is the goal;
-the verifier closes the loop. Most people supply the first two and forget the
-third.
-
-The files are also the channel: the directory is how you talk to the agent, and
-its only durable memory. Anything it needs that lives in your head or the chat is
-invisible to it, and gone the next session, so put the state, the intent, and the
+Each recipe is a policy over a state, a goal, and a verifier. The state is the
+directory: the files are all the agent sees, so keep one concept per directory and
+each stays small and whole (you rarely name a target, the directory scopes one).
+The goal is the prompt. The verifier is the test or harness that says it got
+there, the part most people forget. The directory is also the channel and the
+agent's only durable memory: whatever it needs that lives in your head or the chat
+is invisible, and gone the next session, so keep the state, the intent, and the
 check in the files.
 
 Some recipes are close to universal (test every feature, keep docs true); others
