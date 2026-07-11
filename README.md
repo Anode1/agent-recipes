@@ -31,7 +31,7 @@ the CLI.
 
 [*Compress the Access*](https://doi.org/10.5281/zenodo.20764255)
 
-Wire it into the agent as a skill: [`examples/ais-iac.SKILL.md`](examples/ais-iac.SKILL.md) teaches the agent to operate ais and iac (recall before re-deriving, store what it worked out, wait on `iac recv` instead of polling). It teaches the mechanism, not any keys or values, those are yours to choose.
+Wire it into the agent as a skill: [`examples/ais.SKILL.md`](examples/ais.SKILL.md) teaches the agent to operate ais (recall before re-deriving, store what it worked out). It teaches the mechanism, not any keys or values, those are yours to choose.
 
 ## 3. Coordinate, don't poll
 
@@ -44,6 +44,8 @@ polling its own inbox pays an inference per check.
 ![What it costs to keep an agent waiting](images/iac_wakeup_cost.png)
 
 [*A Wakeup, Not a Broker*](https://doi.org/10.5281/zenodo.21206970)
+
+Wire it into the agent as a skill: [`examples/iac.SKILL.md`](examples/iac.SKILL.md) teaches the agent to wait on `iac recv` instead of polling.
 
 ## 4. Done is code, then doc, then test
 
