@@ -7,8 +7,9 @@ The paragraph under it is why.
 Each recipe is a policy over a state, a goal, and a verifier. The state is the
 directory: the files are all the agent sees, so keep one concept per directory and
 each stays small and whole (you rarely name a target, the directory scopes one).
-The goal is the prompt. The verifier is the test or harness that says it got
-there, the part most people forget. The directory is also the channel and the
+The goal is the prompt. The verifier is the tests, extensive and test-driven,
+run by a harness that tells the agent it got there, not you: it lets the agent
+check its own work without you in the loop, the part most people forget. The directory is also the channel and the
 agent's only durable memory: whatever it needs that lives in your head or the chat
 is invisible, and gone the next session, so keep the state, the intent, and the
 check in the files.
